@@ -5,12 +5,14 @@
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
-pros::MotorGroup leftMotors({-15, -16, -20},pros::MotorGearset::blue); 
-pros::MotorGroup rightMotors({18, 19, 17}, pros::MotorGearset::blue); 
+pros::MotorGroup leftMotors({-8, -9, -10},pros::MotorGearset::blue); 
+pros::MotorGroup rightMotors({4, 2, 1}, pros::MotorGearset::blue); 
 
-pros::Motor Intake(10);
+pros::Motor LowerIntake(15);
 
-pros::Motor Sorter(9);
+pros::Motor UpperIntake(-11);
+
+pros::Motor Loader(13);
 
 pros::Imu imu(21);
 
@@ -18,7 +20,7 @@ pros::adi::Encoder horizontalEnc('C','D');
 
 pros::adi::DigitalOut Scraper('H');
 
-pros::adi::DigitalOut Puncher('B');
+pros::adi::DigitalOut Lift('G');
 
 pros::Rotation verticalLeft(14);
 
@@ -113,7 +115,9 @@ void competition_initialize() {}
 
 
 void autonomous() {
-   chassis.moveToPose(0,20,90,3000);
+   chassis.moveToPose(24,12,20,3000);
+   chassis.moveToPose(0,48,90,3000);
+   chassis.moveToPose(20,40,90,3000);
 }
 
 
@@ -127,33 +131,31 @@ void opcontrol() {
         chassis.arcade(leftY, rightX);
         
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
-			Intake.move(127);
-			Sorter.move(0);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
-			Intake.move(127);
-			Sorter.move(127);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-			Intake.move(70);
-			Sorter.move(-127);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
-			Intake.move(-127);
-			Sorter.move(0);
+			LowerIntake.move(127);
+            UpperIntake.move(127);
+            Loader.move(0);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
-			Intake.move(0);
-			Sorter.move(0);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
-			Scraper.set_value(false);
-		}if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
-            Scraper.set_value(false);
-        }
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+            LowerIntake.move(0);
+            UpperIntake.move(0);
+            Loader.move(0);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+			LowerIntake.move(-127);
+            UpperIntake.move(-127);
+            Loader.move(0);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+            Lift.set_value(true);
+			LowerIntake.move(127);
+            UpperIntake.move(127);
+            Loader.move(127);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+            Lift.set_value(false);
+			LowerIntake.move(127);
+            UpperIntake.move(127);
+            Loader.move(127);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
             Scraper.set_value(true);
-        }
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-            Puncher.set_value(true);
-        }
-        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-            Puncher.set_value(false);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+            Scraper.set_value(False);
         }
 
         pros::delay(10);
