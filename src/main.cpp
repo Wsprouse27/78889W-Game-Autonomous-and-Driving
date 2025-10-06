@@ -1,0 +1,161 @@
+#include "main.h"
+#include "lemlib/api.hpp" 
+
+
+pros::Controller controller(pros::E_CONTROLLER_MASTER);
+
+
+pros::MotorGroup leftMotors({-15, -16, -20},pros::MotorGearset::blue); 
+pros::MotorGroup rightMotors({18, 19, 17}, pros::MotorGearset::blue); 
+
+pros::Motor Intake(10);
+
+pros::Motor Sorter(9);
+
+pros::Imu imu(21);
+
+pros::adi::Encoder horizontalEnc('C','D');
+
+pros::adi::DigitalOut Scraper('H');
+
+pros::adi::DigitalOut Puncher('B');
+
+pros::Rotation verticalLeft(14);
+
+lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_325, -6);
+
+lemlib::TrackingWheel verticalLft(&verticalLeft, lemlib::Omniwheel::NEW_325, -1.5);
+
+
+ 
+
+lemlib::Drivetrain drivetrain(&leftMotors, // left motor group
+                              &rightMotors, // right motor group
+                              12.5, // 10 inch track width
+                              lemlib::Omniwheel::NEW_275, // using new 4" omnis
+                              450, // drivetrain rpm is 360
+                              8 // horizontal drift is 2. If we had traction wheels, it would have been 8
+);
+
+// lateral motion controller
+lemlib::ControllerSettings linearController(10, // proportional gain (kP)
+                                            0, // integral gain (kI)
+                                            3, // derivative gain (kD)
+                                            3, // anti windup
+                                            1, // small error range, in inches
+                                            100, // small error range timeout, in milliseconds
+                                            3, // large error range, in inches
+                                            500, // large error range timeout, in milliseconds
+                                            20 // maximum acceleration (slew)
+);
+
+// angular motion controller
+lemlib::ControllerSettings angularController(2, // proportional gain (kP)
+                                             0, // integral gain (kI)
+                                             10, // derivative gain (kD)
+                                             3, // anti windup
+                                             1, // small error range, in degrees
+                                             100, // small error range timeout, in milliseconds
+                                             3, // large error range, in degrees
+                                             500, // large error range timeout, in milliseconds
+                                             0 // maximum acceleration (slew)
+);
+
+// sensors for odometry
+lemlib::OdomSensors sensors(&verticalLft, 
+                            nullptr, 
+                            &horizontal, 
+                            nullptr, 
+                            &imu 
+);
+
+lemlib::ExpoDriveCurve throttleCurve(3, 
+                                     10, 
+                                     1.019 
+);
+
+
+lemlib::ExpoDriveCurve steerCurve(3,
+                                  10, 
+                                  1.019 
+);
+
+
+lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors, &throttleCurve, &steerCurve);
+
+
+void initialize() {
+    pros::lcd::initialize(); 
+    chassis.calibrate(); 
+
+    
+    pros::Task screenTask([&]() {
+        while (true) {
+            
+            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            
+            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            
+            pros::delay(50);
+        }
+    });
+}
+
+
+void disabled() {}
+
+
+void competition_initialize() {}
+
+
+
+
+void autonomous() {
+   chassis.moveToPose(0,20,90,3000);
+}
+
+
+void opcontrol() {
+   
+    while (true) {
+        
+        int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+        int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
+        
+        chassis.arcade(leftY, rightX);
+        
+		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
+			Intake.move(127);
+			Sorter.move(0);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+			Intake.move(127);
+			Sorter.move(127);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+			Intake.move(70);
+			Sorter.move(-127);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
+			Intake.move(-127);
+			Sorter.move(0);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
+			Intake.move(0);
+			Sorter.move(0);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+			Scraper.set_value(false);
+		}if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
+            Scraper.set_value(false);
+        }
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+            Scraper.set_value(true);
+        }
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+            Puncher.set_value(true);
+        }
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+            Puncher.set_value(false);
+        }
+
+        pros::delay(10);
+    }
+}
