@@ -63,9 +63,9 @@ lemlib::ControllerSettings angularController(2, // proportional gain (kP)
 );
 
 // sensors for odometry
-lemlib::OdomSensors sensors(&verticalLft, 
+lemlib::OdomSensors sensors(nullptr, 
                             nullptr, 
-                            &horizontal, 
+                            nullptr, 
                             nullptr, 
                             &imu 
 );
@@ -114,9 +114,16 @@ void competition_initialize() {}
 
 
 void autonomous() {
-   chassis.moveToPose(24,12,20,3000);
-   chassis.moveToPose(0,48,90,3000);
-   chassis.moveToPose(20,40,90,3000);
+   Loader.brake(); 
+   LowerIntake.move(127);
+   UpperIntake.move(127);
+   chassis.moveToPose(0, 20, 0, 4000,{.maxSpeed = 50});
+   chassis.moveToPose(4, 40, 0, 4000,{.maxSpeed = 30});
+   chassis.moveToPose(22, 10, 180, 4000);
+   Lift.set_value(true);
+   chassis.moveToPose(27, 20, 180, 4000,{.forwards = false});
+
+
 }
 
 
@@ -154,7 +161,7 @@ void opcontrol() {
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
             Scraper.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
-            Scraper.set_value(False);
+            Scraper.set_value(false);
         }
 
         pros::delay(10);
