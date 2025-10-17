@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
+#include "pros/misc.h"
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
@@ -149,12 +150,10 @@ void opcontrol() {
             UpperIntake.move(-127);
             Loader.move(0);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
-            Lift.set_value(true);
 			LowerIntake.move(127);
             UpperIntake.move(127);
             Loader.move(127);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-            Lift.set_value(false);
 			LowerIntake.move(127);
             UpperIntake.move(127);
             Loader.move(127);
@@ -162,7 +161,12 @@ void opcontrol() {
             Scraper.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
             Scraper.set_value(false);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
+            Lift.set_value(true);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
+            Lift.set_value(false);
         }
+
 
         pros::delay(10);
     }
