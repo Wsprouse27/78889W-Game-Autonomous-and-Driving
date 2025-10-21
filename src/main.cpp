@@ -127,12 +127,15 @@ void autonomous() {
    Loader.move(-10); 
    chassis.turnToPoint(10, 20, 3000);
    pros::delay(250);
-   chassis.moveToPose(20,  8,  180,  4000);
-
-
-   //chassis.moveToPose(22, 10, 180, 4000);
-   //Lift.set_value(true);
-   //chassis.moveToPose(27, 20, 180, 4000,{.forwards = false});
+   chassis.moveToPose(10,  27,  180,  4000);
+   chassis.moveToPose(29,  -3,  180,  4000,{.minSpeed = 50});
+   pros::delay(3000);
+   Lift.set_value(true);
+   LowerIntake.move(0);
+   UpperIntake.move(0);
+   chassis.moveToPose(29, 30, 180, 3000);
+   Scraper.set_value(false);
+  
 
 
 }
@@ -150,15 +153,15 @@ void opcontrol() {
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 			LowerIntake.move(127);
             UpperIntake.move(127);
-            Loader.move(0);
+            Loader.move(-10);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
             LowerIntake.move(0);
             UpperIntake.move(0);
-            Loader.move(0);
+            Loader.move(-10);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
 			LowerIntake.move(-127);
             UpperIntake.move(-127);
-            Loader.move(0);
+            Loader.move(-10);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
 			LowerIntake.move(127);
             UpperIntake.move(127);
@@ -166,7 +169,7 @@ void opcontrol() {
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
 			LowerIntake.move(0);
             UpperIntake.move(0);
-            Loader.move(0);
+            Loader.move(-10);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
             Scraper.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
