@@ -1,6 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
 #include "pros/misc.h"
+#include "pros/rtos.hpp"
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
@@ -118,18 +119,27 @@ void autonomous() {
    Loader.brake(); 
    LowerIntake.move(127);
    UpperIntake.move(127);
+   Loader.move(-1);
    chassis.moveToPose(0, 20, 0, 4000,{.maxSpeed = 50});
-   chassis.moveToPose(4, 40, 0, 4000,{.maxSpeed = 30});
-   chassis.moveToPose(22, 10, 180, 4000);
-   Lift.set_value(true);
-   chassis.moveToPose(27, 20, 180, 4000,{.forwards = false});
+   chassis.moveToPose(8, 43, 30, 4000,{.maxSpeed = 30});
+   pros::delay(3000);
+   Scraper.set_value(true);
+   Loader.move(-10); 
+   chassis.turnToPoint(10, 20, 3000);
+   pros::delay(250);
+   chassis.moveToPose(20,  8,  180,  4000);
+
+
+   //chassis.moveToPose(22, 10, 180, 4000);
+   //Lift.set_value(true);
+   //chassis.moveToPose(27, 20, 180, 4000,{.forwards = false});
 
 
 }
 
 
 void opcontrol() {
-   
+   Loader.brake();
     while (true) {
         
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
@@ -154,9 +164,9 @@ void opcontrol() {
             UpperIntake.move(127);
             Loader.move(127);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-			LowerIntake.move(127);
-            UpperIntake.move(127);
-            Loader.move(127);
+			LowerIntake.move(0);
+            UpperIntake.move(0);
+            Loader.move(0);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
             Scraper.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
@@ -165,6 +175,10 @@ void opcontrol() {
             Lift.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
             Lift.set_value(false);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
+            LowerIntake.move(-127);
+            UpperIntake.move(-127);
+            Loader.move(-127);
         }
 
 
