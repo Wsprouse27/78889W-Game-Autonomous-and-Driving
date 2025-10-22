@@ -133,7 +133,7 @@ void autonomous() {
    Lift.set_value(true);
    LowerIntake.move(0);
    UpperIntake.move(0);
-   chassis.moveToPose(29, 30, 180, 3000);
+   chassis.moveToPose(29, 30, 180, 3000, {.forwards = false});
    Scraper.set_value(false);
   
 
