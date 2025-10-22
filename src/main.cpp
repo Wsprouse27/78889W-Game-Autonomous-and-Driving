@@ -119,24 +119,24 @@ void autonomous() {
    Loader.brake(); 
    LowerIntake.move(127);
    UpperIntake.move(127);
-   Loader.move(-1);
-   chassis.moveToPose(0, 20, 0, 4000,{.maxSpeed = 50});
-   chassis.moveToPose(8, 43, 30, 4000,{.maxSpeed = 30});
-   pros::delay(3000);
-   Scraper.set_value(true);
-   Loader.move(-10); 
+   Loader.move(-10);
+   chassis.moveToPose(0, 20, 0, 4000,{ .earlyExitRange = 7});
+   chassis.moveToPose(8, 43, 30, 2000);
+   pros::delay(500);
+   Scraper.set_value(true); 
    chassis.turnToPoint(10, 20, 3000);
-   pros::delay(250);
+   pros::delay(10);
    chassis.moveToPose(10,  27,  180,  4000);
-   chassis.moveToPose(29,  -3,  180,  4000,{.minSpeed = 50});
+   chassis.moveToPose(29,  -7,  180,  4000,{.minSpeed = 50});
    pros::delay(3000);
    Lift.set_value(true);
-   LowerIntake.move(0);
+   LowerIntake.move(127);
    UpperIntake.move(0);
-   chassis.moveToPose(29, 30, 180, 3000, {.forwards = false});
+   chassis.moveToPose(27, 30, 180, 3000, {.forwards = false});
+   UpperIntake.move(0);
+   pros::delay(1000);
    Scraper.set_value(false);
-  
-
+   Loader.move(127);
 
 }
 
