@@ -116,6 +116,27 @@ void competition_initialize() {}
 
 
 void autonomous() {
+    ///SKILLS///
+    /*
+    Loader.move(-10);
+    UpperIntake.move(127);
+    LowerIntake.move(127);
+    chassis.moveToPose(10,  27,  180,  4000);
+    chassis.moveToPose(27,  -5,  180,  4000,{.minSpeed = 70});
+    Lift.set_value(true);
+    pros::delay(3000);
+    chassis.moveToPose(27, 30, 180, 4000, {.forwards = false});
+    UpperIntake.move(127);
+    pros::delay(1000);
+    Scraper.set_value(false);
+    Loader.move(127);
+    */
+
+
+
+
+    ///RIGHT AUTON///
+   /*
    Loader.brake(); 
    LowerIntake.move(127);
    UpperIntake.move(127);
@@ -123,21 +144,21 @@ void autonomous() {
    chassis.moveToPose(0, 20, 0, 4000,{ .earlyExitRange = 7});
    chassis.moveToPose(8, 43, 30, 2000);
    pros::delay(500);
-   Scraper.set_value(true); 
    chassis.turnToPoint(10, 20, 3000);
    pros::delay(10);
    chassis.moveToPose(10,  27,  180,  4000);
-   chassis.moveToPose(29,  -7,  180,  4000,{.minSpeed = 50});
+   Scraper.set_value(true); 
+   chassis.moveToPose(27,  -5,  180,  4000,{.minSpeed = 70});
    pros::delay(3000);
    Lift.set_value(true);
    LowerIntake.move(127);
    UpperIntake.move(0);
-   chassis.moveToPose(27, 30, 180, 3000, {.forwards = false});
-   UpperIntake.move(0);
+   chassis.moveToPose(27, 30, 180, 4000, {.forwards = false});
+   UpperIntake.move(127);
    pros::delay(1000);
    Scraper.set_value(false);
    Loader.move(127);
-
+   */
 }
 
 
