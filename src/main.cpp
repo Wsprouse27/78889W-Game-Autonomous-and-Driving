@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
+#include "pros/distance.hpp"
 #include "pros/misc.h"
 #include "pros/rtos.hpp"
 
@@ -24,6 +25,8 @@ pros::adi::DigitalOut Scraper('H');
 pros::adi::DigitalOut Lift('G');
 
 pros::Rotation verticalLeft(14);
+
+pros::Distance BallReader(5);
 
 lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_325, -6);
 
@@ -86,11 +89,14 @@ lemlib::ExpoDriveCurve steerCurve(3,
 
 lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors, &throttleCurve, &steerCurve);
 
+int IntakedBalls = 0;
+bool ballPreviouslyDetected = false;
+void Test();
 
 void initialize() {
     pros::lcd::initialize(); 
     chassis.calibrate(); 
-
+    
     
     pros::Task screenTask([&]() {
         while (true) {
@@ -98,8 +104,10 @@ void initialize() {
             pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
             pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
             pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            
-            lemlib::telemetrySink()->info("Chassis pose: {}", chassis.getPose());
+            pros::lcd::print(3, "Distance: %d mm\n", BallReader.get_distance()); // Distance Sensor
+            pros::lcd::print(4, "IntakedBalls: %d", IntakedBalls); // Intaked Balls
+            pros::lcd::print(4, "IntakedBalls: %d", IntakedBalls); // Intaked Balls
+            lemlib::telemetrySink()->info("Proximity value: %ld \n", BallReader.get_distance());
             
             pros::delay(50);
         }
@@ -137,7 +145,6 @@ void autonomous() {
 
     ///RIGHT AUTON///
    /*
-   Loader.brake(); 
    LowerIntake.move(127);
    UpperIntake.move(127);
    Loader.move(-10);
@@ -161,11 +168,31 @@ void autonomous() {
    */
 }
 
+void Test(void *param) {
+    
+        while(true){
+        if (BallReader.get_distance() < 150){
+            IntakedBalls = IntakedBalls + 1;
+            pros::delay(500);
+        }
+        if (UpperIntake.get_voltage() > 1 && IntakedBalls >= 4) {
+            UpperIntake.move(0);
+        }
+        pros::delay(10);
+        }
+}
 
 void opcontrol() {
-   Loader.brake();
-    while (true) {
+    
+      pros::Task BallTask(Test,NULL);
+
+       while (true) {
         
+       
+
+        
+
+
         int leftY = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
         int rightX = controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
         
@@ -173,8 +200,12 @@ void opcontrol() {
         
 		if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R1)){
 			LowerIntake.move(127);
-            UpperIntake.move(127);
             Loader.move(-10);
+            if (IntakedBalls < 4) {
+                UpperIntake.move(127);
+            } else {
+                UpperIntake.move(0);
+            }
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
             LowerIntake.move(0);
             UpperIntake.move(0);
@@ -184,13 +215,16 @@ void opcontrol() {
             UpperIntake.move(-127);
             Loader.move(-10);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+            IntakedBalls = 0;
 			LowerIntake.move(127);
             UpperIntake.move(127);
             Loader.move(127);
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+            IntakedBalls = 0;
 			LowerIntake.move(0);
             UpperIntake.move(0);
             Loader.move(-10);
+            
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
             Scraper.set_value(true);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
@@ -205,7 +239,9 @@ void opcontrol() {
             Loader.move(-127);
         }
 
-
+        
+        
         pros::delay(10);
     }
+    
 }
