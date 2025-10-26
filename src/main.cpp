@@ -129,7 +129,7 @@ void autonomous() {
     chassis.moveToPoint(-30, 0, 3000, {.forwards = false, .minSpeed = 100});
 */
     ///RIGHT AUTON///
-   
+   /*
    LowerIntake.move(127);
    Lift.set_value(true);
    Loader.move(-10);
@@ -142,7 +142,33 @@ void autonomous() {
    UpperIntake.move(-127);
    LowerIntake.move(-127);
    
-   
+   */
+
+   ///JERRY.IO AUTO///
+    Lift.set_value(true);
+    chassis.moveToPoint(-34.8, -16.8, 1500);
+    chassis.turnToPoint(-22, -22.7, 1500);
+    chassis.moveToPoint(-22, -22.7, 1500);
+    UpperIntake.move(127);
+    LowerIntake.move(127);
+    Loader.move(-10);
+    chassis.turnToPoint(-13.7, -13.6, 1500);
+    chassis.moveToPoint(-13.7, -13.6, 1500);
+    LowerIntake.move(-127);
+    UpperIntake.move(-127);
+    chassis.turnToPoint(-47.5, -47.6, 1500);
+    chassis.moveToPoint(-47.5, -47.6, 1500);
+    UpperIntake.move(127);
+    LowerIntake.move(127);
+    Scraper.set_value(true);
+    chassis.turnToPoint(-60.1, -47.6, 1500);
+    chassis.moveToPoint(-60.1, -47.6, 1500);
+    chassis.moveToPoint(-33.2, -47.6, 1500, {.forwards = false});
+    UpperIntake.move(127);
+    LowerIntake.move(127);
+    Loader.move(127);
+
+
 }
 
 void Test(void *param) {
