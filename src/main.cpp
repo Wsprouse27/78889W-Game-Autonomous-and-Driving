@@ -38,7 +38,7 @@ lemlib::TrackingWheel verticalLft(&verticalLeft, lemlib::Omniwheel::NEW_325, -1.
 lemlib::Drivetrain drivetrain(&leftMotors, // left motor group
                               &rightMotors, // right motor group
                               12.5, // 10 inch track width
-                              lemlib::Omniwheel::NEW_275, // using new 4" omnis
+                              lemlib::Omniwheel::NEW_325, // using new 4" omnis
                               450, // drivetrain rpm is 360
                               8 // horizontal drift is 2. If we had traction wheels, it would have been 8
 );
@@ -91,7 +91,20 @@ lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors
 
 int IntakedBalls = 0;
 bool ballPreviouslyDetected = false;
-void Test(void *param);
+
+void Test(void *param) {
+    
+        while(true){
+        if (BallReader.get_distance() < 150){
+            IntakedBalls = IntakedBalls + 1;
+            pros::delay(500);
+        }
+        if (UpperIntake.get_voltage() > 1 && IntakedBalls >= 4) {
+            UpperIntake.move(0);
+        }
+        pros::delay(10);
+        }
+}
 
 void initialize() {
     pros::lcd::initialize(); 
@@ -120,7 +133,7 @@ void disabled() {}
 
 void competition_initialize() {}
 
-
+pros::Task BallTask(Test,NULL);
 
 
 void autonomous() {
@@ -129,22 +142,32 @@ void autonomous() {
     chassis.moveToPoint(-30, 0, 3000, {.forwards = false, .minSpeed = 100});
 */
     ///RIGHT AUTON///
-   /*
+  /*
+   Loader.brake(); 
    LowerIntake.move(127);
-   Lift.set_value(true);
+   UpperIntake.move(127);
    Loader.move(-10);
    chassis.moveToPose(0, 20, 0, 4000,{ .earlyExitRange = 7});
    chassis.moveToPose(8, 43, 30, 2000);
    pros::delay(500);
-   chassis.turnToHeading(-45, 3000);
-   chassis.moveToPose(-6, 42, -45, 4000);
+   chassis.turnToPoint(10, 20, 3000);
+   pros::delay(10);
+   chassis.moveToPose(10,  27,  180,  4000);
+   Scraper.set_value(true); 
+   chassis.moveToPose(27,  -5,  180,  4000,{.minSpeed = 70});
+   pros::delay(3000);
+   Lift.set_value(true);
+   LowerIntake.move(127);
+   UpperIntake.move(0);
+   chassis.moveToPose(27, 30, 180, 4000, {.forwards = false});
+   UpperIntake.move(127);
    pros::delay(1000);
-   UpperIntake.move(-127);
-   LowerIntake.move(-127);
-   
+   Scraper.set_value(false);
+   Loader.move(127);
    */
 
    ///JERRY.IO AUTO///
+    BallTask.resume();
     Lift.set_value(true);
     chassis.moveToPoint(-34.8, -16.8, 1500);
     chassis.turnToPoint(-22, -22.7, 1500);
@@ -154,12 +177,13 @@ void autonomous() {
     Loader.move(-10);
     chassis.turnToPoint(-13.7, -13.6, 1500);
     chassis.moveToPoint(-13.7, -13.6, 1500);
+    BallTask.suspend();
     LowerIntake.move(-127);
     UpperIntake.move(-127);
-    chassis.turnToPoint(-47.5, -47.6, 1500);
-    chassis.moveToPoint(-47.5, -47.6, 1500);
+    chassis.moveToPoint(-47.5, -47.6, 1500, {.forwards = false});
     UpperIntake.move(127);
     LowerIntake.move(127);
+    BallTask.resume();
     Scraper.set_value(true);
     chassis.turnToPoint(-60.1, -47.6, 1500);
     chassis.moveToPoint(-60.1, -47.6, 1500);
@@ -171,23 +195,11 @@ void autonomous() {
 
 }
 
-void Test(void *param) {
-    
-        while(true){
-        if (BallReader.get_distance() < 150){
-            IntakedBalls = IntakedBalls + 1;
-            pros::delay(500);
-        }
-        if (UpperIntake.get_voltage() > 1 && IntakedBalls >= 4) {
-            UpperIntake.move(0);
-        }
-        pros::delay(10);
-        }
-}
+
 
 void opcontrol() {
     
-      pros::Task BallTask(Test,NULL);
+      BallTask.resume();
 
        while (true) {
         
