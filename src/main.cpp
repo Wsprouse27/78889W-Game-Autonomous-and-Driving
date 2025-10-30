@@ -4,13 +4,14 @@
 #include "pros/misc.h"
 #include "pros/rtos.hpp"
 
+
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 
 pros::MotorGroup leftMotors({-8, -9, -10},pros::MotorGearset::blue); 
 pros::MotorGroup rightMotors({4, 2, 1}, pros::MotorGearset::blue); 
 
-pros::Motor LowerIntake(15);
+pros::Motor LowerIntake(-15);
 
 pros::Motor UpperIntake(-11);
 
@@ -167,27 +168,28 @@ void autonomous() {
    */
 
    ///JERRY.IO AUTO///
-    BallTask.resume();
+   chassis.setPose(-61, -17, 90);
     Lift.set_value(true);
     chassis.moveToPoint(-34.8, -16.8, 1500);
     chassis.turnToPoint(-22, -22.7, 1500);
-    chassis.moveToPoint(-22, -22.7, 1500);
+    chassis.moveToPoint(-22, -22.7, 1500, {.maxSpeed=30});
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(-10);
-    chassis.turnToPoint(-13.7, -13.6, 1500);
-    chassis.moveToPoint(-13.7, -13.6, 1500);
-    BallTask.suspend();
-    LowerIntake.move(-127);
+    chassis.turnToPoint(-10.7, -13.6, 1500);
+    chassis.moveToPoint(-10.7, -13.6, 1500);
+    LowerIntake.move(-60);
     UpperIntake.move(-127);
-    chassis.moveToPoint(-47.5, -47.6, 1500, {.forwards = false});
+    pros::delay(3000);
+    chassis.moveToPoint(-46, -46, 1500, {.forwards = false});
     UpperIntake.move(127);
     LowerIntake.move(127);
-    BallTask.resume();
-    Scraper.set_value(true);
     chassis.turnToPoint(-60.1, -47.6, 1500);
+    Scraper.set_value(true);
     chassis.moveToPoint(-60.1, -47.6, 1500);
-    chassis.moveToPoint(-33.2, -47.6, 1500, {.forwards = false});
+    pros::delay(1500);
+    Scraper.set_value(true);
+    chassis.moveToPoint(-33.2, -48.6, 1500, {.forwards = false});
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(127);
