@@ -168,11 +168,12 @@ void autonomous() {
    */
 
    ///JERRY.IO AUTO///
-   chassis.setPose(-61, -17, 90);
+    BallTask.suspend();
+    chassis.setPose(-61, -17, 90);
     Lift.set_value(true);
     chassis.moveToPoint(-34.8, -16.8, 1500);
     chassis.turnToPoint(-22, -22.7, 1500);
-    chassis.moveToPoint(-22, -22.7, 1500, {.maxSpeed=30});
+    chassis.moveToPoint(-22, -22.7, 1500, {.maxSpeed=20});
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(-10);
