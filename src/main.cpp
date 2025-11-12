@@ -168,7 +168,7 @@ void autonomous() {
    */
 
    ///Right AUTO///
-   /*
+   
     BallTask.suspend();
     chassis.setPose(-61, -17, 90);
     Lift.set_value(true);
@@ -195,35 +195,37 @@ void autonomous() {
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(127);
-    */
+    
 
     ///LEFT AUTON///
+    /*
     BallTask.suspend();
     chassis.setPose(-61.8, 16.7, 90);
-    chassis.moveToPoint(-38.7, 16.7, 2000);
-    chassis.turnToPoint(-15.8, 23.7, 2000);
-    chassis.moveToPoint(-15.8, 23.7, 3000,{.maxSpeed = 40});
     LowerIntake.move(127);
     UpperIntake.move(127);
-    Loader.move(-20);
-    chassis.turnToPoint(-11.1, 13.8, 2000, {.forwards = false});
-    chassis.moveToPoint(-11.1, 13.8, 2000, {.forwards = false});
+    Loader.move(-50);
+    chassis.moveToPoint(-38.7, 16.7, 2000);
+    chassis.turnToPoint(-22, 21.8, 2000);
+    chassis.moveToPoint(-22, 21.8, 2000,{.maxSpeed = 35});
+    chassis.turnToPoint(-15.5, 12.7, 2000, {.forwards = false});
+    UpperIntake.move(0);
+    chassis.moveToPoint(-15.5, 12.7, 2000, {.forwards = false});
+    UpperIntake.move(127);
     Loader.move(50);
-    pros::delay(2000);
+    pros::delay(2500);
     Loader.move(-20);
-    chassis.moveToPoint(-47.4, 49, 2000/**/);
-    chassis.turnToPoint(-60.6, 40, 2000);
+    chassis.turnToPoint(-47.4, 47.4, 2000);
     Scraper.set_value(true);
-    chassis.moveToPoint(-60.6, 40, 2000);
-    /*
+    chassis.moveToPoint(-47.4, 47.4, 2000);
+    chassis.turnToPoint(-62.8, 47.4, 2000);
+    chassis.moveToPoint(-62.8, 46, 2000);
     Lift.set_value(true);
     pros::delay(1500);
-    chassis.moveToPoint(-32.4, 48, 2000);
+    chassis.moveToPoint(-32.4, 47, 2000, {.forwards = false});
     Scraper.set_value(false);
     pros::delay(1);
     Loader.move(127);
     */
-
     
 
 }
