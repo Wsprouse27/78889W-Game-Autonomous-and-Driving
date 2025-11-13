@@ -6,8 +6,6 @@
 
 
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
-
 pros::MotorGroup leftMotors({-8, -9, -10},pros::MotorGearset::blue); 
 pros::MotorGroup rightMotors({4, 2, 1}, pros::MotorGearset::blue); 
 
@@ -139,36 +137,19 @@ pros::Task BallTask(Test,NULL);
 
 void autonomous() {
     ///SKILLS///
-    /*
-    chassis.moveToPoint(-30, 0, 3000, {.forwards = false, .minSpeed = 100});
-*/
-    ///RIGHT AUTON///
-  /*
-   Loader.brake(); 
-   LowerIntake.move(127);
-   UpperIntake.move(127);
-   Loader.move(-10);
-   chassis.moveToPose(0, 20, 0, 4000,{ .earlyExitRange = 7});
-   chassis.moveToPose(8, 43, 30, 2000);
-   pros::delay(500);
-   chassis.turnToPoint(10, 20, 3000);
-   pros::delay(10);
-   chassis.moveToPose(10,  27,  180,  4000);
-   Scraper.set_value(true); 
-   chassis.moveToPose(27,  -5,  180,  4000,{.minSpeed = 70});
-   pros::delay(3000);
-   Lift.set_value(true);
-   LowerIntake.move(127);
-   UpperIntake.move(0);
-   chassis.moveToPose(27, 30, 180, 4000, {.forwards = false});
-   UpperIntake.move(127);
-   pros::delay(1000);
-   Scraper.set_value(false);
-   Loader.move(127);
-   */
+        chassis.setPose(-46.5,-7.4, 180);
+        Scraper.set_value(true);
+        Loader.move(-30);
+        LowerIntake.move(127);
+        UpperIntake.move(127);
+        chassis.moveToPoint(-46.5, -47, 2500);
+        chassis.turnToPoint(-60, -50, 2500);
+        chassis.moveToPoint(-60, -50, 2500);
+        
+
 
    ///Right AUTO///
-   
+   /*
     BallTask.suspend();
     chassis.setPose(-61, -17, 90);
     Lift.set_value(true);
@@ -195,7 +176,7 @@ void autonomous() {
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(127);
-    
+    */
 
     ///LEFT AUTON///
     /*
