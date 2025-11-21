@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
+#include "pros/adi.hpp"
 #include "pros/distance.hpp"
 #include "pros/misc.h"
 #include "pros/rtos.hpp"
@@ -17,19 +18,15 @@ pros::Motor Loader(13);
 
 pros::Imu imu(21);
 
-pros::adi::Encoder horizontalEnc('C','D');
-
 pros::adi::DigitalOut Scraper('H');
 
 pros::adi::DigitalOut Lift('G');
 
-pros::Rotation verticalLeft(14);
+pros::adi::DigitalOut DeScore('F');
 
 pros::Distance BallReader(5);
 
-lemlib::TrackingWheel horizontal(&horizontalEnc, lemlib::Omniwheel::NEW_325, -6);
 
-lemlib::TrackingWheel verticalLft(&verticalLeft, lemlib::Omniwheel::NEW_325, -1.5);
 
 
  
@@ -136,39 +133,36 @@ pros::Task BallTask(Test,NULL);
 
 
 void autonomous() {
+
+
     ///SKILLS///
+    
         BallTask.suspend();
         chassis.setPose(-46.5,-7.4, 180);
         Scraper.set_value(true);
-        Loader.move(-30);
+        Loader.move(127);
         LowerIntake.move(127);
         UpperIntake.move(127);
+        DeScore.set_value(true);
+        Lift.set_value(true);
         chassis.moveToPoint(-46.5, -47, 2500,{.maxSpeed = 50});
         chassis.turnToHeading(270, 1500);
-        chassis.moveToPoint(-62, -47, 2500);
+        chassis.moveToPoint(-62, -47, 1500);
+        chassis.moveToPoint(-55, -47, 1500, {.forwards = false});
+        chassis.moveToPoint(-62, -47, 1500);
+        chassis.moveToPoint(-55, -47, 1500, {.forwards = false});
+        chassis.moveToPoint(-62, -47, 1500);
         pros::delay(1500);
-        Lift.set_value(true);
         chassis.moveToPoint(-45, -48, 2500,{.forwards = false, .maxSpeed = 50});
-        chassis.turnToPoint(-36.2, -60, 1500);
-        chassis.moveToPoint(-36.2, -60, 1500,{.maxSpeed = 50});
-        UpperIntake.move(0);
-        LowerIntake.move(0);
         Scraper.set_value(false);
-        chassis.turnToPoint(43, -61, 1500);
-        chassis.moveToPoint(43, -61, 3000,{.maxSpeed = 50});
-        chassis.turnToPoint(48.9, -47.6, 1500);
-        chassis.moveToPoint(48.9, -47.6, 1500);
-        chassis.turnToHeading(90, 1500);
-        chassis.moveToPoint(33.6, -47.6, 1500, {.forwards = false, .maxSpeed = 50});
-        pros::delay(500);
-        Loader.move(127);
-        UpperIntake.move(127);
-        LowerIntake.move(127);
-        pros::delay(3000);
-        Loader.move(-30);
+        chassis.turnToPoint(-68, -32, 1500);
+        chassis.moveToPoint(-68, -32, 1500);
+        chassis.turnToPoint(-72, 20, 1500);
+        chassis.moveToPoint(-72, 20, 1500);
         Scraper.set_value(true);
-        chassis.moveToPoint(59.9, -47.3, 2000);
-        
+        pros::delay(1500);
+        Scraper.set_value(false);
+    
 
         
 
@@ -178,22 +172,22 @@ void autonomous() {
     chassis.setPose(-61, -17, 90);
     Lift.set_value(true);
     chassis.moveToPoint(-34.8, -16.8, 1500);
-    chassis.turnToPoint(-22, -22.7, 1500);
-    chassis.moveToPoint(-22, -22.7, 1500, {.maxSpeed=20});
+    chassis.turnToPoint(-19.6, -23.2, 1500);
+    chassis.moveToPoint(-19.6, -23.2, 1500, {.maxSpeed=30});
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(-10);
-    chassis.turnToPoint(-10.7, -13.6, 1500);
-    chassis.moveToPoint(-10.7, -13.6, 1500);
+    chassis.turnToPoint(-12.5, -13.4, 1500);
+    chassis.moveToPoint(-12.5, -13.4, 1500);
     LowerIntake.move(-60);
     UpperIntake.move(-127);
     pros::delay(3000);
-    chassis.moveToPoint(-46, -46, 1500, {.forwards = false});
+    chassis.moveToPoint(-47.5, -47.5, 1500, {.forwards = false});
     UpperIntake.move(127);
     LowerIntake.move(127);
-    chassis.turnToPoint(-60.1, -47.6, 1500);
+    chassis.turnToPoint(-61.7, -49, 1500);
     Scraper.set_value(true);
-    chassis.moveToPoint(-60.1, -47.6, 1500);
+    chassis.moveToPoint(-61.7, -49, 2000);
     pros::delay(1500);
     Scraper.set_value(true);
     chassis.moveToPoint(-33.2, -48.6, 1500, {.forwards = false});
@@ -208,27 +202,28 @@ void autonomous() {
     chassis.setPose(-61.8, 16.7, 90);
     LowerIntake.move(127);
     UpperIntake.move(127);
-    Loader.move(-50);
+    Loader.move(-70);
     chassis.moveToPoint(-38.7, 16.7, 2000);
     chassis.turnToPoint(-22, 21.8, 2000);
-    chassis.moveToPoint(-22, 21.8, 2000,{.maxSpeed = 35});
-    chassis.turnToPoint(-15.5, 12.7, 2000, {.forwards = false});
+    chassis.moveToPoint(-22, 21.8, 1500,{.maxSpeed = 35});
+    chassis.turnToPoint(-13.9, 14, 2000, {.forwards = false});
     UpperIntake.move(0);
-    chassis.moveToPoint(-15.5, 12.7, 2000, {.forwards = false});
+    chassis.moveToPoint(-13.9, 14, 2000, {.forwards = false});
     UpperIntake.move(127);
     Loader.move(50);
     pros::delay(2500);
     Loader.move(-20);
-    chassis.turnToPoint(-47.4, 47.4, 2000);
+    chassis.turnToPoint(-47.4, 47, 2000);
     Scraper.set_value(true);
-    chassis.moveToPoint(-47.4, 47.4, 2000);
-    chassis.turnToPoint(-62.8, 47.4, 2000);
-    chassis.moveToPoint(-62.8, 46, 2000);
+    chassis.moveToPoint(-47.4, 47, 2000);
+    chassis.turnToPoint(-63, 47, 2000);
+    chassis.moveToPoint(-63, 47, 2000);
     Lift.set_value(true);
     pros::delay(1500);
-    chassis.moveToPoint(-32.4, 47, 2000, {.forwards = false});
+    chassis.moveToPoint(-33, 47.9, 2000, {.forwards = false});
     Scraper.set_value(false);
-    pros::delay(1);
+    pros::delay(20);
+    IntakedBalls = 0;
     Loader.move(127);
     */
     
@@ -280,9 +275,9 @@ void opcontrol() {
             UpperIntake.move(0);
             Loader.move(-10);
             
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
             Scraper.set_value(true);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
             Scraper.set_value(false);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
             Lift.set_value(true);
@@ -292,6 +287,10 @@ void opcontrol() {
             LowerIntake.move(-127);
             UpperIntake.move(-127);
             Loader.move(-127);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+            DeScore.set_value(false);
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
+            DeScore.set_value(true);
         }
 
         
