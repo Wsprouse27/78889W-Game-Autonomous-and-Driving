@@ -1,6 +1,7 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
 #include "pros/adi.hpp"
+#include "pros/ai_vision.hpp"
 #include "pros/distance.hpp"
 #include "pros/misc.h"
 #include "pros/rtos.hpp"
@@ -26,8 +27,9 @@ pros::adi::DigitalOut DeScore('F');
 
 pros::Distance BallReader(5);
 
+pros::Distance LeftGoal(12);
 
-
+pros::Distance RightGoal(19);
 
  
 
@@ -86,7 +88,6 @@ lemlib::ExpoDriveCurve steerCurve(3,
 lemlib::Chassis chassis(drivetrain, linearController, angularController, sensors, &throttleCurve, &steerCurve);
 
 int IntakedBalls = 0;
-bool ballPreviouslyDetected = false;
 
 void Test(void *param) {
     
@@ -101,6 +102,27 @@ void Test(void *param) {
         pros::delay(10);
         }
 }
+
+
+
+
+
+void CheckGoal(){
+    int HeadingGoal = imu.get_heading();
+    pros::delay(10);
+    while (RightGoal.get_distance() < 500 || LeftGoal.get_distance() < 500){
+        if(RightGoal.get_distance() < 500){
+
+            chassis.turnToHeading(HeadingGoal + 12.5, 500);
+        }
+        if(LeftGoal.get_distance() < 500){
+
+            chassis.turnToHeading(HeadingGoal - 7, 500);
+        }
+        pros::delay(50);
+    }
+}
+
 
 void initialize() {
     pros::lcd::initialize(); 
@@ -131,12 +153,14 @@ void competition_initialize() {}
 
 pros::Task BallTask(Test,NULL);
 
-
 void autonomous() {
 
+   
+
+    
 
     ///SKILLS///
-    
+    /*
         BallTask.suspend();
         chassis.setPose(-46.5,-7.4, 180);
         Scraper.set_value(true);
@@ -162,7 +186,7 @@ void autonomous() {
         Scraper.set_value(true);
         pros::delay(1500);
         Scraper.set_value(false);
-    
+    */
 
         
 
@@ -190,7 +214,7 @@ void autonomous() {
     chassis.moveToPoint(-61.7, -49, 2000);
     pros::delay(1500);
     Scraper.set_value(true);
-    chassis.moveToPoint(-33.2, -48.6, 1500, {.forwards = false});
+    chassis.moveToPoint(-30, -46.5, 1500, {.forwards = false});
     UpperIntake.move(127);
     LowerIntake.move(127);
     Loader.move(127);
@@ -199,16 +223,18 @@ void autonomous() {
     ///LEFT AUTON///
     /*
     BallTask.suspend();
+    Scraper.set_value(true);
     chassis.setPose(-61.8, 16.7, 90);
-    LowerIntake.move(127);
-    UpperIntake.move(127);
     Loader.move(-70);
     chassis.moveToPoint(-38.7, 16.7, 2000);
     chassis.turnToPoint(-22, 21.8, 2000);
     chassis.moveToPoint(-22, 21.8, 1500,{.maxSpeed = 35});
-    chassis.turnToPoint(-13.9, 14, 2000, {.forwards = false});
+    Scraper.set_value(false);
+    LowerIntake.move(127);
+    UpperIntake.move(127);
+    chassis.turnToPoint(-13.9, 10, 2000, {.forwards = false});
     UpperIntake.move(0);
-    chassis.moveToPoint(-13.9, 14, 2000, {.forwards = false});
+    chassis.moveToPoint(-13.9, 10, 2000, {.forwards = false});
     UpperIntake.move(127);
     Loader.move(50);
     pros::delay(2500);
@@ -220,13 +246,47 @@ void autonomous() {
     chassis.moveToPoint(-63, 47, 2000);
     Lift.set_value(true);
     pros::delay(1500);
-    chassis.moveToPoint(-33, 47.9, 2000, {.forwards = false});
+    chassis.moveToPoint(-30, 47.9, 2000, {.forwards = false});
     Scraper.set_value(false);
     pros::delay(20);
     IntakedBalls = 0;
     Loader.move(127);
     */
     
+
+    ///Left Auto With Distanse sensor stuff///
+    
+    BallTask.suspend();
+    Scraper.set_value(true);
+    chassis.setPose(-61.8, 16.7, 90);
+    Loader.move(-70);
+    chassis.moveToPoint(-38.7, 16.7, 2000);
+    Scraper.set_value(false);
+    chassis.turnToPoint(-22, 21.8, 2000);
+    chassis.moveToPoint(-22, 21.8, 1500,{.maxSpeed = 35});
+    LowerIntake.move(127);
+    UpperIntake.move(127);
+    chassis.turnToPoint(-15, 12, 2000, {.forwards = false});
+    UpperIntake.move(0);
+    chassis.moveToPoint(-15, 12, 2000, {.forwards = false});
+    UpperIntake.move(127);
+    Loader.move(50);
+    pros::delay(2500);
+    Loader.move(-20);
+    chassis.turnToPoint(-47.4, 47, 2000);
+    Scraper.set_value(true);
+    chassis.moveToPoint(-47.4, 47, 2000);
+    chassis.turnToPoint(-63, 47, 2000);
+    chassis.moveToPoint(-63, 47, 2000);
+    Lift.set_value(true);
+    pros::delay(2500);
+    chassis.moveToPoint(-37, 47.9, 2000, {.forwards = false});
+    Scraper.set_value(false);
+    pros::delay(20);
+    IntakedBalls = 0;
+    pros::delay(2000);
+    //CheckGoal();
+    Loader.move(127);
 
 }
 
