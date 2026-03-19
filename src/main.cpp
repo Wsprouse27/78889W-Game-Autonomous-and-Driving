@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lemlib/api.hpp" 
+#include "lemlib/chassis/chassis.hpp"
 #include "lemlib/chassis/trackingWheel.hpp"
 #include "pros/adi.hpp"
 #include "pros/ai_vision.hpp"
@@ -14,12 +15,14 @@ pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 //Drivetrain Setup//
 pros::MotorGroup leftMotors({-12, -17, 16},pros::MotorGearset::blue); 
-pros::MotorGroup rightMotors({18, 19, -20}, pros::MotorGearset::blue);
-pros::Imu imu(-13);
+pros::MotorGroup rightMotors({18, 19, -20}, pros::MotorGearset::blue); 
+pros::Imu imu(-4);
+pros::Rotation HorizontalEncoder(-8);
+lemlib::TrackingWheel HorizontalTracking(&HorizontalEncoder, lemlib::Omniwheel::NEW_2, 6.5);
 
 //Intake Setup//
 pros::Motor LowerIntake(-10);
-pros::Motor UpperIntake(21);
+pros::Motor UpperIntake(-21);
 
 //Pneumatic Devices//
 pros::adi::DigitalOut Scraper('A');
@@ -44,31 +47,31 @@ lemlib::Drivetrain drivetrain(&leftMotors, // Left Motor Group
 //Lateral Motion COntroller
 lemlib::ControllerSettings linearController(10, // proportional gain (kP)
                                             0, // integral gain (kI)
-                                            3, // derivative gain (kD)
-                                            3, // anti windup
-                                            1, // small error range, in inches
-                                            100, // small error range timeout, in milliseconds
-                                            3, // large error range, in inches
-                                            500, // large error range timeout, in milliseconds
-                                            20 // maximum acceleration (slew)
+                                            6, // derivative gain (kD)
+                                            0, // anti windup
+                                            0, // small error range, in inches
+                                            0, // small error range timeout, in milliseconds
+                                            0, // large error range, in inches
+                                            0, // large error range timeout, in milliseconds
+                                            0 // maximum acceleration (slew)
 );
 
 //Angular Motion Controller
 lemlib::ControllerSettings angularController(2, // proportional gain (kP)
                                              0, // integral gain (kI)
-                                             10, // derivative gain (kD)
-                                             3, // anti windup
-                                             1, // small error range, in degrees
-                                             100, // small error range timeout, in milliseconds
-                                             3, // large error range, in degrees
-                                             500, // large error range timeout, in milliseconds
+                                             30, // derivative gain (kD)
+                                             15, // anti windup
+                                             0, // small error range, in degrees
+                                             0, // small error range timeout, in milliseconds
+                                             0, // large error range, in degrees
+                                             0, // large error range timeout, in milliseconds
                                              0 // maximum acceleration (slew)
 );
 
 //Sensors Setup for Odometry//
 lemlib::OdomSensors sensors(nullptr, //Internal Motor Controllers
                             nullptr, //Internal Motor Controllers
-                            nullptr, //Internal Motor Controllers
+                            &HorizontalTracking, //Horizontal Tracking Wheel
                             nullptr, //Internal Motor Controllers
                             &imu //Inertial Sensor
 );
@@ -127,47 +130,71 @@ void competition_initialize() {}
 //Autonomous Functions
 void autonomous() {
     
-    ColorSet();
-    ///Left Goal Rush///
-    
+    //chassis.setPose(0,0,0);
+    //chassis.turnToHeading(90, 2000);
+
+
+    //ColorSet();
+    ///Left 7///
     /*
     chassis.setPose(0,0,0);
     LowerIntake.move(127);
     DeScore.set_value(true);
-    chassis.moveToPoint(0, 37, 2000, {.earlyExitRange = 2});
-    chassis.moveToPoint(-20, 25, 2000, {.forwards = false, .earlyExitRange = 2});
-    chassis.moveToPoint(-20, 45, 3000,{.forwards = false});
+    chassis.moveToPoint(-15, 30, 2000);
+    chassis.turnToPoint(-38, 0, 1500);
+    chassis.moveToPoint(-40, 0, 2000,{.maxSpeed = 80});
+    chassis.turnToHeading(180, 1500);
+    Scraper.set_value(true);
+    chassis.moveToPoint(-40, -16, 4000);
     pros::delay(1500);
+    chassis.moveToPoint(-38, 25, 1500, {.forwards = false});
+    pros::delay(1000);
     UpperIntake.move(127);
-    pros::delay(5000);
+    pros::delay(3000);
     UpperIntake.move(0);
+    Scraper.set_value(false);
+    chassis.moveToPoint(-38, 0, 2000);
+    chassis.turnToHeading(220, 1000);
+    DeScore.set_value(false);
+    chassis.moveToPoint(-23, 25, 2000, {.forwards = false});
+    chassis.moveToPoint(-23, 35, 2000, {.forwards = false});
     */
-    
 
     ///Left Split///
-    /*
+    
     chassis.setPose(0,0,0);
     LowerIntake.move(127);
     DeScore.set_value(true);
-    chassis.moveToPoint(-12, 30, 2000);
-    chassis.turnToPoint(3, 37, 1500, {.forwards = false});
-    chassis.moveToPoint(3, 37, 1500, {.forwards = false});
-    pros::delay(1000);
-    UpperIntake.move(40);
-    pros::delay(900);
-    UpperIntake.move(0);
+    chassis.moveToPoint(-10, 20, 1500);
+    chassis.turnToHeading(220, 800);
+    chassis.moveToPoint(5, 28, 1500, {.forwards = false});
+    Midscore.set_value(true);
     pros::delay(200);
-    chassis.turnToPoint(-40, 3, 1500, {.minSpeed = 50});
-    chassis.moveToPoint(-40, 3, 4000);
+    LowerIntake.move_relative(-80, 70);
+    UpperIntake.move_relative(-80, 70);
+    UpperIntake.move(-127);
+    LowerIntake.move(127);
+    pros::delay(800);
+    UpperIntake.move(0);
+    Midscore.set_value(false);
+    chassis.moveToPoint(-35, 0, 1500/*, {.maxSpeed = 70}*/);
+    chassis.turnToHeading(170, 800);
     Scraper.set_value(true);
-    chassis.turnToPoint(-40, -14, 1500);
-    chassis.moveToPoint(-40, -14, 2000,{.minSpeed = 40});
-    pros::delay(2500);
-    chassis.moveToPoint(-35, 20, 1500, {.forwards = false});
-    pros::delay(1000);
+    chassis.moveToPoint(-35, -16, 2500, {.minSpeed = 90});
+    pros::delay(1200);
+    chassis.moveToPoint(-33, 20, 1500, {.forwards = false});
+    pros::delay(900);
     UpperIntake.move(127);
-    Scraper.set_value(false);
+    
+    
+    /*
+    pros::delay(1000);
+    UpperIntake.move(0);
+    DeScore.set_value(false);
+    chassis.moveToPoint(-25, 10, 2000);
+    chassis.turnToHeading(180, 2000);
     */
+    
 
     ///Right 7 High///
     /*
@@ -177,18 +204,75 @@ void autonomous() {
     chassis.moveToPoint(15, 30, 2000);
     chassis.turnToPoint(41, 0, 1500);
     chassis.moveToPoint(41, 0, 2000,{.maxSpeed = 80});
-    chassis.turnToHeading(176, 1500);
+    chassis.turnToHeading(185, 1500);
     Scraper.set_value(true);
-    chassis.moveToPoint(43, -15, 4000, {.maxSpeed = 80});
+    chassis.moveToPoint(41, -12, 4000);
     pros::delay(2000);
     chassis.moveToPoint(41, 25, 1500, {.forwards = false});
     pros::delay(1000);
     UpperIntake.move(127);
+    pros::delay(3000);
+    UpperIntake.move(0);
+    Scraper.set_value(false);
+    chassis.moveToPoint(41, 0, 2000);
+    DeScore.set_value(false);
+    chassis.turnToHeading(200, 2000);
+    chassis.moveToPoint(50, 25, 2000, {.forwards = false});
+    chassis.moveToPoint(50, 35, 2000, {.forwards = false});
+    */
+
+    ///Left 4 Push///
+    /*
+    chassis.setPose(0,0,0);
+    LowerIntake.move(127);
+    DeScore.set_value(true);
+    chassis.moveToPoint(-15, 30, 2000);
+    chassis.turnToPoint(-39, 0, 1500);
+    chassis.moveToPoint(-39, 0, 2000,{.maxSpeed = 80});
+    chassis.turnToHeading(-185, 1500);
+    chassis.moveToPoint(-39, 25, 1500, {.forwards = false});
+    pros::delay(1000);
+    UpperIntake.move(127);
     pros::delay(2000);
     UpperIntake.move(0);
-    chassis.turnToHeading(270, 1500, {.minSpeed = 127});
-    chassis.turnToHeading(270, 1000, {.minSpeed = 127});
+    DeScore.set_value(false);
+    chassis.moveToPoint(-39, 5, 2000);
+    chassis.turnToHeading(-210, 2000);
+    chassis.moveToPoint(-43, 25, 2000, {.forwards = false});
+    chassis.turnToHeading(-170, 2000);
+    chassis.moveToPoint(-43, 40, 2000);
     */
+
+    ///Rigth 4 Push///
+    /*
+    chassis.setPose(0,0,0);
+    LowerIntake.move(127);
+    DeScore.set_value(true);
+    chassis.moveToPoint(15, 30, 2000);
+    chassis.turnToPoint(38, 0, 1500);
+    chassis.moveToPoint(38, 0, 2000,{.maxSpeed = 80});
+    chassis.turnToHeading(185, 1500);
+    chassis.moveToPoint(38, 25, 1500, {.forwards = false});
+    pros::delay(1000);
+    UpperIntake.move(127);
+    pros::delay(2000);
+    UpperIntake.move(0);
+    DeScore.set_value(false);
+    chassis.moveToPoint(38, 5, 2000);
+    chassis.turnToHeading(210, 2000);
+    chassis.moveToPoint(40, 25, 2000, {.forwards = false});
+    chassis.moveToPoint(43, 40, 2000, {.forwards = false});
+    */
+    
+
+
+
+
+
+
+    
+
+    
     
     BlueMotor.set_value(0);
     RedMotor.set_value(0);
@@ -199,7 +283,7 @@ void autonomous() {
 //Driver Control Function runs during Driver Control
 void opcontrol() {
      
-     ColorSet();
+     //ColorSet();
         
        while (true) {
         
@@ -217,31 +301,31 @@ void opcontrol() {
 		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_R2)){
             LowerIntake.move(0);
             UpperIntake.move(0);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
-			LowerIntake.move(-127);
-            UpperIntake.move(-127);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
 			LowerIntake.move(127);
             UpperIntake.move(127);
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
-			
-		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
             Scraper.set_value(true);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)){
-            Scraper.set_value(false);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_X)){
-            Midscore.set_value(true);
-            UpperIntake.move(60);
-            LowerIntake.move(127);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_B)){
-            Midscore.set_value(false);
+            Scraper.set_value(false);
         }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_A)){
             LowerIntake.move(-127);
-            UpperIntake.move(-127);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)){
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)){
             DeScore.set_value(false);
-        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_UP)){
+        }else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_Y)){
             DeScore.set_value(true);
+        }
+
+        if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L1)){
+            UpperIntake.move(127);
+            LowerIntake.move(127);
+		}else if (controller.get_digital(pros::E_CONTROLLER_DIGITAL_L2)){
+		Midscore.set_value(true);
+        UpperIntake.move(-127);
+        LowerIntake.move(127);
+		} else {
+            Midscore.set_value(false);
+            UpperIntake.move(0);
         }
         
         
